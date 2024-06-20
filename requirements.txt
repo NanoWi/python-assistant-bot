@@ -1,0 +1,14 @@
+blinker
+certifi
+charset-normalizer
+click
+Flask
+idna
+importlib_metadata
+itsdangerous
+Jinja2
+MarkupSafe
+requests
+urllib3
+Werkzeug
+zipp
