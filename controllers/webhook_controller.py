@@ -2,6 +2,9 @@ from flask import Flask, request, Blueprint
 import config 
 import services.all as services
 import requests
+from utils.extract_nested_values import extract_nested_values
+import json
+
 
 webhook_blueprint = Blueprint('webhook', __name__)
 
@@ -9,18 +12,19 @@ webhook_blueprint = Blueprint('webhook', __name__)
 @webhook_blueprint.route('/webhook', methods=['POST'])
 def recibir_mensajes():
     try:
+
+        
         body = request.get_json()
-        entry = body['entry'][0]
-        changes = entry['changes'][0]
-        value = changes['value']
-        message = value['messages'][0]
+        
+        messages = extract_nested_values(body,['entry','changes','value','messages'])
+        message= messages[0]
+        text = services.obtener_Mensaje_whatsapp(message)
         number = services.replace_start(message['from'])
         messageId = message['id']
-        contacts = value['contacts'][0]
-        name = contacts['profile']['name']
-        text = services.obtener_Mensaje_whatsapp(message)
-
+        
+        name = extract_nested_values(body,['entry','changes','value','contacts','profile','name'])
         services.administrar_chatbot(text, number,messageId,name)
+
         return 'enviado'
 
     except Exception as e:
